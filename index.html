@@ -1,0 +1,543 @@
+<!doctype html><html lang="pt-BR"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0E6B5E" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#131817" media="(prefers-color-scheme: dark)">
+<meta name="application-name" content="Precificador Relimax">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Precificador">
+<meta name="description" content="Precificador da Relimax: margem por marketplace no Lucro Real.">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+</head><body>
+<title>Precificador Relimax</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --bg:#F5F7F4; --surface:#FFFFFF; --surface2:#EDF1EC; --ink:#1B2320; --muted:#66716B; --line:#D8DFD8; --line2:#C3CCC4;
+  --accent:#0E6B5E; --accent-ink:#FFFFFF; --accent-soft:#DDEDE8;
+  --pos:#1F7A3F; --neg:#B4322A; --warn:#A86A12;
+  --edit:#FBFCF4; --edit-line:#CBD3B8;
+  --shadow:0 1px 2px rgba(20,30,25,.06),0 6px 20px rgba(20,30,25,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#131817; --surface:#1B2220; --surface2:#222B28; --ink:#E6ECE7; --muted:#97A39C; --line:#2C3632; --line2:#3B4742;
+    --accent:#3FB79F; --accent-ink:#0E1A16; --accent-soft:#1E3A34;
+    --pos:#5CC783; --neg:#F08A80; --warn:#E3A94E;
+    --edit:#1F2724; --edit-line:#4A5A48;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131817; --surface:#1B2220; --surface2:#222B28; --ink:#E6ECE7; --muted:#97A39C; --line:#2C3632; --line2:#3B4742;
+  --accent:#3FB79F; --accent-ink:#0E1A16; --accent-soft:#1E3A34;
+  --pos:#5CC783; --neg:#F08A80; --warn:#E3A94E;
+  --edit:#1F2724; --edit-line:#4A5A48;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;font-size:15px;line-height:1.45;padding-inline:20px;padding-block:20px 48px;font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:"Fraunces","Georgia",serif;font-weight:600;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:26px} h2{font-size:18px} h3{font-size:15px}
+button{font:inherit;cursor:pointer}
+.wrap{max-width:1400px;margin:0 auto}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:18px}
+header p{margin:4px 0 0;color:var(--muted);max-width:64ch}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid var(--line2);background:var(--surface);color:var(--ink);border-radius:6px;padding:7px 12px;font-weight:600;font-size:14px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.sm{font-size:12.5px;padding:4px 8px}
+.btn:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.layout{display:grid;grid-template-columns:330px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:980px){.layout{grid-template-columns:minmax(0,1fr)}.rail{position:static!important}}
+.layout>main,.layout>aside{min-width:0}
+.rail{position:sticky;top:16px;display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 32px);overflow-y:auto;padding-right:2px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.panel h2{font-size:15px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.eyebrow{font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.field{display:grid;grid-template-columns:1fr 118px;align-items:center;gap:8px;padding:5px 0;border-bottom:1px dashed var(--line)}
+.field:last-child{border-bottom:0}
+.field label{font-weight:500}
+.field small{display:block;color:var(--muted);font-weight:400;font-size:12.5px}
+.in{display:flex;align-items:center;border:1px solid var(--edit-line);background:var(--edit);border-radius:6px;overflow:hidden;height:32px}
+.in span{padding:0 7px;color:var(--muted);font-size:12.5px;font-weight:600;background:var(--surface2);height:100%;display:flex;align-items:center;border-right:1px solid var(--edit-line)}
+.in span.r{border-right:0;border-left:1px solid var(--edit-line)}
+.in select{border:0;background:transparent;color:var(--ink);font:inherit;font-weight:600;width:100%;padding:0 6px;height:100%}
+.in input{border:0;background:transparent;color:var(--ink);font:inherit;font-weight:600;width:100%;min-width:0;padding:0 8px;text-align:right;height:100%}
+.in.ro{border-style:dashed;background:var(--surface2)}
+.in.ro input{color:var(--accent)}
+.toggle{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}
+.toggle:last-child{border-bottom:0}
+.toggle label{font-weight:500}
+.toggle small{display:block;color:var(--muted);font-size:12.5px}
+.switch{position:relative;width:40px;height:22px;flex:none}
+.switch input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer;z-index:1}
+.switch i{position:absolute;inset:0;border-radius:11px;background:var(--line2);transition:background .15s}
+.switch i::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform .15s}
+.switch input:checked+i{background:var(--accent)}
+.switch input:checked+i::after{transform:translateX(18px)}
+.switch input:focus-visible+i{outline:2px solid var(--accent);outline-offset:2px}
+details.sub{border-top:1px dashed var(--line);margin-top:6px;padding-top:6px}
+details.sub summary{cursor:pointer;font-weight:600;font-size:13px;color:var(--muted);list-style:none;display:flex;justify-content:space-between}
+details.sub summary::after{content:"+"} details.sub[open] summary::after{content:"–"}
+
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:16px}
+@media (max-width:900px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi h3{color:var(--muted);font-family:"Source Sans 3",sans-serif;font-weight:600;font-size:12.5px;text-transform:uppercase;letter-spacing:.06em}
+.kpi .big{font-family:"Fraunces",serif;font-size:26px;font-weight:600;line-height:1.1;margin-top:4px}
+.kpi .sub{color:var(--muted);font-size:13px;margin-top:2px}
+.pos{color:var(--pos)} .neg{color:var(--neg)} .warn{color:var(--warn)} .dash{color:var(--muted)}
+
+.tablewrap{overflow-x:auto;background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:16px;box-shadow:var(--shadow)}
+.tablewrap.flat{box-shadow:none}
+table.t{border-collapse:collapse;width:100%}
+.t td.nm{white-space:normal;min-width:150px;max-width:190px}
+.t td.nm .cap{font-size:11.5px;line-height:1.3}
+.t th,.t td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;vertical-align:middle}
+.t th{font-weight:600;font-size:12.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;background:var(--surface2)}
+.t th:first-child,.t td:first-child{text-align:left}
+.t th small{display:block;text-transform:none;letter-spacing:0;font-weight:400;white-space:normal;max-width:120px}
+.t tr.sel td{background:var(--accent-soft)}
+.t tr.off td{opacity:.45}
+.t tr.ch td:first-child{font-weight:600}
+.t tr.ch{cursor:pointer}
+.t td .cap{display:block;color:var(--muted);font-size:12px;font-weight:400;white-space:normal;max-width:210px;margin-left:auto;line-height:1.3}
+.t .pr{font-family:"Fraunces",serif;font-size:17px;font-weight:600}
+.rate{display:inline-flex;align-items:center;border:1px solid var(--edit-line);background:var(--edit);border-radius:5px;height:26px;overflow:hidden;vertical-align:middle}
+.rate input{border:0;background:transparent;color:var(--ink);font:inherit;font-weight:600;width:50px;text-align:right;padding:0 4px;height:100%}
+.rate input::placeholder{color:var(--muted);font-weight:400}
+.rate span{padding:0 6px 0 2px;color:var(--muted);font-size:12px}
+.rate.w input{width:60px}
+.sect{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:0 0 10px}
+.sect h2{font-size:17px}
+.sect .slider{display:flex;align-items:center;gap:10px;flex:1;min-width:260px;max-width:520px}
+.sect input[type=range]{flex:1;accent-color:var(--accent)}
+.sect .tv{font-family:"Fraunces",serif;font-size:22px;font-weight:600;min-width:66px;text-align:right}
+.note{font-size:13px;color:var(--muted);margin:0 0 16px;max-width:95ch}
+
+.dre th:first-child,.dre td:first-child{position:sticky;left:0;background:var(--surface);min-width:250px;white-space:normal}
+.dre thead th{position:sticky;top:0}
+.dre .sec td{background:var(--surface2);color:var(--ink);font-family:"Fraunces",serif;font-size:15px;font-weight:600;padding-top:9px;padding-bottom:7px;text-align:left}
+.dre .sec td:first-child{background:var(--surface2)}
+.dre .sub td:first-child{padding-left:22px}
+.dre td:first-child small{color:var(--muted);display:block;font-size:12px;font-weight:400}
+.dre .tot td{font-weight:700;border-top:1px solid var(--line2)}
+.dre .hi td{font-weight:700;font-size:16px;background:var(--accent-soft)}
+.dre .hi td:first-child{background:var(--accent-soft)}
+.cell{display:inline-flex;align-items:center;justify-content:flex-end;gap:8px}
+.cell .val{min-width:84px;display:inline-block}
+
+.two{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-bottom:16px}
+svg.chart{width:100%;height:auto;display:block;max-height:320px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:13px;color:var(--muted);margin-top:8px}
+.legend i{display:inline-block;width:14px;height:3px;border-radius:2px;vertical-align:middle;margin-right:6px}
+
+.scen{display:flex;flex-direction:column;gap:6px}
+.scen .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface2)}
+.scen .row b{font-weight:600}
+.scen .row small{color:var(--muted);display:block;font-size:12px}
+.scen .row .acts{display:flex;gap:4px}
+.scen .empty{color:var(--muted);font-size:13px}
+.saveline{display:flex;gap:6px;margin-bottom:10px}
+.saveline input{flex:1;border:1px solid var(--edit-line);background:var(--edit);color:var(--ink);border-radius:6px;padding:6px 8px;font:inherit;min-width:0}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:6px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none;z-index:9}
+.toast.on{opacity:1}
+@media print{.rail,.toolbar{display:none}.layout{grid-template-columns:1fr}body{padding:0}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+@media (max-width:980px){.rail{max-height:none;overflow:visible}body{padding-inline:max(16px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-right))}}
+</style>
+
+<div class="wrap">
+<header>
+  <div>
+    <div class="eyebrow">Relimax · Casa &amp; Decoração · Lucro Real</div>
+    <h1>Precificador Relimax</h1>
+    <p>Preencha o produto e o preço que vai praticar: cada marketplace mostra a sua margem com as taxas dele. Mova a barra de margem-alvo e veja o preço ideal por canal. Aceita vírgula ou ponto.</p>
+  </div>
+  <div class="toolbar">
+    <button class="btn" id="btnReset" type="button">Limpar produto</button>
+    <button class="btn" id="btnResetCh" type="button">Restaurar taxas de referência</button>
+    <button class="btn" id="btnPrint" type="button">Imprimir / PDF</button>
+  </div>
+</header>
+
+<div class="layout">
+<aside class="rail">
+  <section class="panel">
+    <h2>Produto <span class="eyebrow" id="markupLbl">markup —</span></h2>
+    <div class="field"><label for="custoReal">Custo real<small>o que sai do caixa</small></label><div class="in"><span>R$</span><input type="text" inputmode="decimal" autocomplete="off" id="custoReal"></div></div>
+    <div class="field"><label for="custoNota">Custo na nota<small>base dos créditos</small></label><div class="in"><span>R$</span><input type="text" inputmode="decimal" autocomplete="off" id="custoNota"></div></div>
+    <div class="field"><label for="preco"><b>Preço de tabela</b><small>preço cheio do anúncio</small></label><div class="in"><span>R$</span><input type="text" inputmode="decimal" autocomplete="off" id="preco"></div></div>
+    <div class="field"><label for="descTipo">Desconto aplicado</label><div class="in"><select id="descTipo"><option value="pct">% da tabela</option><option value="rs">R$ por unidade</option></select></div></div>
+    <div class="field"><label for="descVal"><b>Valor do desconto</b></label><div class="in"><span id="descPre">%</span><input type="text" inputmode="decimal" autocomplete="off" id="descVal"></div></div>
+    <div class="field"><label>Preço final ao cliente<small>base das taxas e impostos</small></label><div class="in ro"><span>R$</span><input type="text" id="pEffLbl" readonly tabindex="-1"></div></div>
+  </section>
+
+  <section class="panel">
+    <h2>Impostos · Lucro Real</h2>
+    <div class="eyebrow" style="margin-bottom:4px">Na compra (créditos)</div>
+    <div class="field"><label for="r_icmsC">ICMS</label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_icmsC"><span class="r">%</span></div></div>
+    <div class="field"><label for="r_pisC">PIS/COFINS</label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_pisC"><span class="r">%</span></div></div>
+    <div class="field"><label for="r_ipiC">IPI</label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_ipiC"><span class="r">%</span></div></div>
+    <div class="field"><label for="r_stC">ICMS-ST<small>custo, sem crédito</small></label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_stC"><span class="r">%</span></div></div>
+    <div class="field"><label for="r_notaC">Custo de nota na compra</label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_notaC"><span class="r">%</span></div></div>
+    <div class="eyebrow" style="margin:10px 0 4px">Na venda</div>
+    <div class="field"><label for="r_icmsV">ICMS</label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_icmsV"><span class="r">%</span></div></div>
+    <div class="field"><label for="r_difalV">ICMS DIFAL</label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_difalV"><span class="r">%</span></div></div>
+    <div class="field"><label for="r_pisV">PIS/COFINS<small id="pisEffLbl">efetiva —</small></label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_pisV"><span class="r">%</span></div></div>
+    <div class="field"><label for="r_ipiV">IPI</label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_ipiV"><span class="r">%</span></div></div>
+    <div class="field"><label for="r_irpj">IRPJ/CSLL estimado<small>% sobre o preço, opcional</small></label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_irpj"><span class="r">%</span></div></div>
+    <details class="sub"><summary>Regras e Simples (informativo)</summary>
+      <div class="toggle"><label for="tExIcms">Retirar ICMS e DIFAL da base do PIS/COFINS<small>RE 574.706/PR</small></label><span class="switch"><input type="checkbox" id="tExIcms"><i></i></span></div>
+      <div class="toggle"><label for="tExPis">Retirar PIS/COFINS da própria base<small>RE 1.233.096</small></label><span class="switch"><input type="checkbox" id="tExPis"><i></i></span></div>
+      <div class="toggle"><label for="tIsentoDifal">Venda isenta de DIFAL</label><span class="switch"><input type="checkbox" id="tIsentoDifal"><i></i></span></div>
+      <div class="field"><label for="custoNotaSN">Custo na nota · Simples</label><div class="in"><span>R$</span><input type="text" inputmode="decimal" autocomplete="off" id="custoNotaSN"></div></div>
+      <div class="field"><label for="r_das">Alíquota do Simples (DAS)</label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_das"><span class="r">%</span></div></div>
+    </details>
+  </section>
+
+  <section class="panel">
+    <h2>Rebate do marketplace</h2>
+    <div class="field"><label for="rebTipo">Como o canal devolve</label><div class="in"><select id="rebTipo"><option value="rs">R$ por unidade</option><option value="pct">% do preço</option><option value="com">pontos de comissão</option></select></div></div>
+    <div class="field"><label for="rebVal">Valor do rebate<small id="rebHint">ex.: 3,00 = R$ 3,00 por venda</small></label><div class="in"><span id="rebPre">R$</span><input type="text" inputmode="decimal" autocomplete="off" id="rebVal"></div></div>
+    <div class="toggle"><label for="tRebPis">Rebate tributado por PIS/COFINS?</label><span class="switch"><input type="checkbox" id="tRebPis"><i></i></span></div>
+    <div class="toggle"><label for="tCredPres">Crédito presumido<small>R$ por unidade, se houver</small></label><span class="switch"><input type="checkbox" id="tCredPres"><i></i></span></div>
+    <div class="field"><label for="credPres">Valor do crédito presumido</label><div class="in"><span>R$</span><input type="text" inputmode="decimal" autocomplete="off" id="credPres"></div></div>
+  </section>
+
+  <section class="panel">
+    <h2>Cenários salvos</h2>
+    <div class="saveline"><input id="scenName" placeholder="Nome (ex.: Cesto bambu)"><button class="btn primary" id="btnSave" type="button">Salvar</button></div>
+    <div class="scen" id="scenList"></div>
+  </section>
+</aside>
+
+<main>
+  <div class="kpis" id="kpis"></div>
+
+  <div class="sect">
+    <h2>Preço por canal</h2>
+    <div class="slider"><span class="eyebrow">margem-alvo</span><input type="range" id="tgt" min="0" max="60" step="0.5"><div class="tv" id="tgtLbl">20%</div></div>
+  </div>
+  <div class="tablewrap">
+  <table class="t" id="chTable">
+    <thead><tr>
+      <th>Canal<small>clique: ver DRE / ligar-desligar</small></th>
+      <th>Margem hoje<small>no preço praticado · LR</small></th>
+      <th>Preço ideal p/ <span id="tgtCol">20%</span><small>tabela a cadastrar</small></th>
+      <th>Comissão<small>auto pela faixa · ou digite</small></th>
+      <th>Taxa fixa<small>por item</small></th>
+      <th>Outras<small>% do preço</small></th>
+      <th>Frete<small>R$ seu</small></th>
+      <th>Ads<small>% do preço</small></th>
+    </tr></thead>
+    <tbody id="chBody"></tbody>
+  </table>
+  </div>
+  <p class="note" id="chObs"></p>
+  <p class="note" id="chNote">Taxas de referência (out/2026) das tabelas públicas de cada marketplace para Casa &amp; Decoração; a faixa muda sozinha conforme o preço final. Digite um valor na comissão ou na taxa fixa para sobrescrever com o número exato da sua conta. Clique no nome do canal para ligar/desligar.</p>
+
+  <div class="sect"><h2 id="dreTitle">DRE detalhada</h2><span class="eyebrow">Lucro Real · Simples só informativo</span></div>
+  <div class="tablewrap flat">
+  <table class="t dre">
+    <thead><tr><th>Linha</th><th>Lucro Real</th><th>Simples <small>(informativo)</small></th></tr></thead>
+    <tbody id="dreBody"></tbody>
+  </table>
+  </div>
+
+  <section class="panel" style="margin-bottom:16px">
+    <h2>Margem de contribuição × preço final (Lucro Real)</h2>
+    <div id="chart"></div>
+    <div class="legend" id="legend"></div>
+  </section>
+</main>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+const $=id=>document.getElementById(id);
+const fmt=v=>(isFinite(v)?v:0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const pct=v=>((isFinite(v)?v:0)*100).toLocaleString('pt-BR',{minimumFractionDigits:1,maximumFractionDigits:1})+'%';
+const N=v=>(v===null||v===undefined||isNaN(v))?0:v;
+const parse=el=>{const t=String(el.value).trim().replace(/\s|R\$|%/g,'').replace(',','.');if(t==='')return null;const v=parseFloat(t);return isNaN(v)?null:v;};
+
+// ---------- canais: tabelas de referência (out/2026) ----------
+// tiers: [{ate: preço final máximo, com: %, fixa: R$}] — a faixa é escolhida pelo preço final ao cliente
+const CH_REF={
+  mlc:{nome:'Mercado Livre Clássico',cor:'#F5B400',tiers:[{ate:19.99,com:12,fixa:5.5},{ate:78.99,com:12,fixa:6},{ate:Infinity,com:12,fixa:0}],outras:0,frete:null,ads:null,
+       obs:'12% Casa, Móveis e Decoração · custo fixo R$ 5,50–6,00 abaixo de R$ 79 · acima disso você paga parte do frete (campo Frete)'},
+  mlp:{nome:'Mercado Livre Premium',cor:'#2C6ED5',tiers:[{ate:19.99,com:17,fixa:5.5},{ate:78.99,com:17,fixa:6},{ate:Infinity,com:17,fixa:0}],outras:0,frete:null,ads:null,
+       obs:'17% Casa, Móveis e Decoração · parcelamento sem juros embutido'},
+  shp:{nome:'Shopee',cor:'#EE4D2D',tiers:[{ate:7.99,com:50,fixa:0},{ate:79.99,com:20,fixa:4},{ate:99.99,com:14,fixa:16},{ate:199.99,com:14,fixa:20},{ate:Infinity,com:14,fixa:26}],outras:0,frete:null,ads:null,
+       obs:'CNPJ, mar/2026: 20% + R$ 4 até R$ 79,99 · 14% + R$ 16/20/26 nas faixas seguintes · sem teto · Campanha de Destaque +2,5% em Outras'},
+  amz:{nome:'Amazon',cor:'#232F3E',tiers:[{ate:Infinity,com:15,fixa:0}],outras:0,frete:null,ads:null,
+       obs:'Casa e Cozinha 12–15% (referência 15%) · plano profissional sem taxa por item'},
+  mgl:{nome:'Magalu',cor:'#0086FF',tiers:[{ate:Infinity,com:16,fixa:0}],outras:0,frete:null,ads:null,
+       obs:'Móveis e Decoração 14–18% (referência 16%)'},
+  ttk:{nome:'TikTok Shop',cor:'#111111',tiers:[{ate:49.99,com:10,fixa:4},{ate:Infinity,com:6,fixa:6}],outras:6,frete:null,ads:null,
+       obs:'desde 15/07/2026: 10% + R$ 4 abaixo de R$ 50 · 6% + R$ 6 a partir de R$ 50 · +6% programa de frete grátis (em Outras)'},
+  shn:{nome:'SHEIN',cor:'#7A3E9D',tiers:[{ate:Infinity,com:18,fixa:0}],outras:0,frete:null,ads:null,
+       obs:'18% desde 01/03/2026 · sem taxa fixa · frete por conta do vendedor (campo Frete)'},
+};
+const CH_IDS=Object.keys(CH_REF);
+function defChannels(){const o={};CH_IDS.forEach(id=>{o[id]={on:true,comOv:null,fixaOv:null,outras:CH_REF[id].outras,frete:null,ads:null};});return o;}
+
+const DEF={
+  custoReal:null,custoNota:null,custoNotaSN:null,preco:null,descTipo:'pct',descVal:null,
+  icmsC:null,pisC:9.25,ipiC:null,stC:null,notaC:null, icmsV:null,difalV:null,pisV:9.25,ipiV:null,irpj:null, das:null,
+  tExIcms:true,tExPis:true,tIsentoDifal:false,tRebPis:false,tCredPres:false,
+  rebTipo:'rs',rebVal:null,credPres:null,
+  tgt:20, sel:'mlc', ch:defChannels()
+};
+const VER='6';
+let S=JSON.parse(JSON.stringify(DEF));
+try{
+  if(localStorage.getItem('prec.ver')!==VER){localStorage.removeItem('prec.state');localStorage.setItem('prec.ver',VER);}
+  const s=localStorage.getItem('prec.state');if(s){const o=JSON.parse(s);S=Object.assign(S,o);S.ch=Object.assign(defChannels(),o.ch||{});}
+}catch(e){}
+
+// ---------- motor ----------
+function effPrice(pList,s){const d=N(s.descVal);const e=s.descTipo==='rs'?pList-d:pList*(1-d/100);return Math.max(0,e);}
+function listPrice(pEff,s){const d=N(s.descVal);return s.descTipo==='rs'?pEff+d:(d>=100?NaN:pEff/(1-d/100));}
+function tierFor(id,p){return CH_REF[id].tiers.find(t=>p<=t.ate)||CH_REF[id].tiers[CH_REF[id].tiers.length-1];}
+function chFees(id,p,s){const c=s.ch[id],t=tierFor(id,p);const comPct=(c.comOv===null?t.com:N(c.comOv))+N(c.outras);const fixa=c.fixaOv===null?t.fixa:N(c.fixaOv);
+  return {comPct,comBase:c.comOv===null?t.com:N(c.comOv),fixa,frete:N(c.frete),adsPct:N(c.ads),auto:c.comOv===null,autoF:c.fixaOv===null};}
+function rebate(p,s){const v=N(s.rebVal);return s.rebTipo==='rs'?v:p*v/100;}
+// Lucro Real (replica a planilha; Ads e frete como custo; MC = resultado bruto − custo real)
+function calcLR(p,s,f){
+  const nota=N(s.custoNota);
+  const icmsC=-nota*N(s.icmsC)/100, stC=nota*N(s.stC)/100, pisC=-nota*N(s.pisC)/100, ipiC=-nota*N(s.ipiC)/100, notaC=-nota*N(s.notaC)/100;
+  const custoLiq=nota+icmsC+pisC+ipiC+stC;
+  const icmsV=-p*N(s.icmsV)/100, difal=s.tIsentoDifal?0:-p*N(s.difalV)/100;
+  const rate=N(s.pisV)/100, full=p*rate, savPis=full-(p-full)*rate, savIcms=full-(p+icmsV+difal)*rate;
+  const pisV=-(full-(s.tExIcms?savIcms:0)-(s.tExPis?savPis:0));
+  const ipiV=-p*N(s.ipiV)/100;
+  const com=-(p*f.comPct/100), fixa=-f.fixa, frete=-f.frete, ads=-p*f.adsPct/100;
+  const reb=rebate(p,s), rebTax=s.tRebPis?-reb*rate:0, cred=s.tCredPres?N(s.credPres):0;
+  const credCom=(com+fixa+(s.rebTipo==='com'?reb:0))*N(s.pisC)/100;
+  const receita=p+icmsV+difal+pisV+rebTax+ipiV+frete+ads+com+fixa+reb+cred;
+  const recuperar=icmsC+pisC+credCom+ipiC, credito=-recuperar, bruto=receita+credito;
+  const mc=bruto-N(s.custoReal)+notaC;
+  const recolher=icmsV+difal+pisV+rebTax+ipiV, imposto=recolher-recuperar;
+  const irpj=-p*N(s.irpj)/100;
+  return {p,nota,icmsC,stC,pisC,ipiC,notaC,custoLiq,icmsV,difal,pisV,pisEff:p?-pisV/p:0,rebTax,ipiV,com,fixa,frete,ads,reb,cred,credCom,taxas:-(com+fixa+frete+ads),
+    receita,credito,bruto,mb:p?bruto/p:0,mc,mcp:p?mc/p:0,recolher,recuperar,imposto,impP:p?imposto/p:0,irpj,liq:mc+irpj,liqP:p?(mc+irpj)/p:0,markup:nota?p/nota:0};
+}
+function calcSN(p,s,f){
+  const nota=N(s.custoNotaSN), custoLiq=nota, das=-p*N(s.das)/100;
+  const com=-(p*f.comPct/100), fixa=-f.fixa, frete=-f.frete, ads=-p*f.adsPct/100;
+  const reb=rebate(p,s), rebTax=s.tRebPis?-reb*N(s.das)/100:0, cred=s.tCredPres?N(s.credPres):0;
+  const receita=p+das+rebTax+frete+ads+com+fixa+reb+cred, bruto=receita, mc=bruto-N(s.custoReal);
+  return {p,nota,custoLiq,das,rebTax,com,fixa,frete,ads,reb,cred,taxas:-(com+fixa+frete+ads),receita,credito:0,bruto,mb:p?bruto/p:0,mc,mcp:p?mc/p:0,recolher:das+rebTax,recuperar:0,imposto:das+rebTax,impP:p?(das+rebTax)/p:0,irpj:0,liq:mc,liqP:p?mc/p:0};
+}
+function calcCh(id,pEff,s){const f=chFees(id,pEff,s);const LR=calcLR(pEff,s,f),SN=calcSN(pEff,s,f);return {f,LR,SN};}
+// preço final que entrega margem m no canal (as faixas tornam a função por partes — busca numérica)
+function priceForCh(id,m,s){
+  const g=p=>calcLR(p,s,chFees(id,p,s)).mc-m*p;
+  let lo=null;for(let p=0.5;p<=20000;p+=(p<100?0.25:p<1000?1:10)){if(g(p)>=0){lo=p;break;}}
+  if(lo===null)return NaN;
+  let a=Math.max(0.01,lo-(lo<100?0.25:lo<1000?1:10)),b=lo;for(let i=0;i<40;i++){const mid=(a+b)/2;if(g(mid)>=0)b=mid;else a=mid;}
+  return b;
+}
+
+// ---------- bind ----------
+const globals=['custoReal','custoNota','custoNotaSN','preco','descVal','icmsC','pisC','ipiC','stC','notaC','icmsV','difalV','pisV','ipiV','irpj','das','rebVal','credPres'];
+const gid=k=>['icmsC','pisC','ipiC','stC','notaC','icmsV','difalV','pisV','ipiV','irpj','das'].includes(k)?'r_'+k:k;
+const toggles=['tExIcms','tExPis','tIsentoDifal','tRebPis','tCredPres'];
+const sync=(el,cur)=>{const v=parse(el);if(v!==null)return v;el.value=cur??'';return cur;};
+function descUi(){$('descPre').textContent=S.descTipo==='rs'?'R$':'%';}
+function rebUi(){const t=S.rebTipo;$('rebPre').textContent=t==='rs'?'R$':t==='pct'?'%':'p.p.';$('rebHint').textContent=t==='rs'?'ex.: 3,00 = R$ 3,00 por venda':t==='pct'?'ex.: 5 = 5% do preço final':'ex.: comissão cai de 20% para 15% = 5';}
+function bindGlobals(){
+  globals.forEach(k=>{const el=$(gid(k));S[k]=sync(el,S[k]);el.oninput=el.onchange=()=>{S[k]=parse(el);render();};});
+  toggles.forEach(k=>{const el=$(k);el.checked=!!S[k];el.onchange=()=>{S[k]=el.checked;render();};});
+  const dt=$('descTipo');dt.value=S.descTipo||'pct';dt.onchange=()=>{S.descTipo=dt.value;descUi();render();};descUi();
+  const rt=$('rebTipo');rt.value=S.rebTipo||'rs';rt.onchange=()=>{S.rebTipo=rt.value;rebUi();render();};rebUi();
+  $('tgt').value=S.tgt;$('tgt').oninput=()=>{S.tgt=parseFloat($('tgt').value);render();};
+}
+function clearInputs(){document.querySelectorAll('input[inputmode=decimal]').forEach(i=>i.value='');}
+
+// ---------- tabela de canais ----------
+function buildChannels(){
+  const tb=$('chBody');tb.innerHTML='';
+  CH_IDS.forEach(id=>{const r=CH_REF[id],c=S.ch[id];
+    const tr=document.createElement('tr');tr.className='ch';tr.dataset.id=id;
+    tr.innerHTML=`<td class="nm" title="${r.obs}"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.cor};margin-right:8px;vertical-align:middle"></span>${r.nome}</td>
+      <td id="mg_${id}"></td><td id="id_${id}"></td>
+      <td><span class="rate"><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_comOv" placeholder="auto"><span>%</span></span><span class="cap" id="comAuto_${id}"></span></td>
+      <td><span class="rate w"><span style="padding-left:6px">R$</span><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_fixaOv" placeholder="auto"></span><span class="cap" id="fixaAuto_${id}"></span></td>
+      <td><span class="rate"><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_outras"><span>%</span></span></td>
+      <td><span class="rate w"><span style="padding-left:6px">R$</span><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_frete"></span></td>
+      <td><span class="rate"><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_ads"><span>%</span></span></td>
+`;
+    tb.appendChild(tr);
+    ['comOv','fixaOv','outras','frete','ads'].forEach(k=>{const el=$(`c_${id}_${k}`);c[k]=sync(el,c[k]);el.onclick=e=>e.stopPropagation();el.oninput=el.onchange=()=>{c[k]=parse(el);render();};});
+    tr.querySelector('td').onclick=()=>{if(S.sel===id){c.on=!c.on;}else{S.sel=id;if(!c.on)c.on=true;}render();};
+    tr.querySelectorAll('td:not(:first-child)').forEach(td=>td.onclick=e=>{if(e.target.tagName!=='INPUT'){S.sel=id;render();}});
+  });
+}
+function fillChannels(pEff){
+  const m=S.tgt/100;$('tgtLbl').textContent=pct(m);$('tgtCol').textContent=pct(m);
+  CH_IDS.forEach(id=>{const c=S.ch[id],tr=document.querySelector(`tr[data-id="${id}"]`);
+    tr.classList.toggle('sel',S.sel===id);tr.classList.toggle('off',!c.on);
+    if(!(pEff>0)){$(`mg_${id}`).innerHTML=$(`id_${id}`).innerHTML='<span class="dash">—</span>';$(`comAuto_${id}`).textContent='';$(`fixaAuto_${id}`).textContent='';return;}
+    const R=calcCh(id,pEff,S),f=R.f,L=R.LR;
+    $(`comAuto_${id}`).textContent=f.auto?`faixa: ${f.comBase.toLocaleString('pt-BR')}%`:'digitado';
+    $(`fixaAuto_${id}`).textContent=f.autoF?`faixa: ${fmt(f.fixa)}`:'digitado';
+    const cls=L.mc>0?'pos':'neg';
+    $(`mg_${id}`).innerHTML=`<span class="pr ${cls}">${pct(L.mcp)}</span><span class="cap"><b class="${cls}">${fmt(L.mc)}</b>/un · taxas ${fmt(L.taxas)} (${pct(L.taxas/pEff)}) · imposto ${fmt(L.imposto)}</span>`;
+    const pi=priceForCh(id,m,S),pl=listPrice(pi,S),hasD=N(S.descVal)>0;
+    if(isFinite(pi)&&isFinite(pl)&&N(S.custoReal)>0){
+      $(`id_${id}`).innerHTML=`<span class="pr">${fmt(hasD?pl:pi)}</span><span class="cap">${hasD?'final ao cliente '+fmt(pi)+' · ':''}equilíbrio ${fmt(listPrice(priceForCh(id,0,S),S))}</span><button class="btn sm" type="button" data-apply="${pl.toFixed(2)}" style="margin-top:4px">Usar</button>`;
+    } else $(`id_${id}`).innerHTML='<span class="dash">inviável</span>';
+  });
+  document.querySelectorAll('#chBody [data-apply]').forEach(b=>b.onclick=e=>{e.stopPropagation();S.preco=parseFloat(b.dataset.apply);$('preco').value=S.preco;render();toast('Preço de tabela aplicado: '+fmt(S.preco));});
+}
+
+// ---------- KPIs ----------
+function fillKpis(pEff){
+  const nota=N(S.custoNota),f0={comPct:0,fixa:0,frete:0,adsPct:0};const L=calcLR(pEff,S,f0);
+  const on=CH_IDS.filter(id=>S.ch[id].on);
+  let best=null;if(pEff>0&&on.length){best=on.map(id=>({id,mc:calcCh(id,pEff,S).LR.mc})).sort((a,b)=>b.mc-a.mc)[0];}
+  $('kpis').innerHTML=`
+    <div class="kpi"><h3>Preço final ao cliente</h3><div class="big">${pEff>0?fmt(pEff):'—'}</div><div class="sub">${N(S.descVal)>0?'tabela '+fmt(N(S.preco))+' − desconto':'sem desconto'}</div></div>
+    <div class="kpi"><h3>Custo líquido do produto</h3><div class="big">${nota>0?fmt(L.custoLiq):'—'}</div><div class="sub">nota ${fmt(nota)} − créditos ${fmt(-(L.icmsC+L.pisC+L.ipiC))}</div></div>
+    <div class="kpi"><h3>Impostos de saída</h3><div class="big">${pEff>0?fmt(-(L.icmsV+L.difal+L.pisV+L.ipiV)):'—'}</div><div class="sub">${pEff>0?pct(-(L.icmsV+L.difal+L.pisV+L.ipiV)/pEff)+' do preço final':'ICMS + DIFAL + PIS/COFINS'}</div></div>
+    <div class="kpi"><h3>Maior margem hoje</h3><div class="big ${best&&best.mc>0?'pos':best?'neg':''}">${best?pct(best.mc/pEff):'—'}</div><div class="sub">${best?CH_REF[best.id].nome+' · '+fmt(best.mc)+'/un':'preencha o produto'}</div></div>`;
+  $('markupLbl').textContent=pEff>0&&nota>0?'markup '+(pEff/nota).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})+'×':'markup —';
+  $('pisEffLbl').textContent=pEff>0?'efetiva '+pct(L.pisEff):'efetiva —';
+}
+
+// ---------- DRE do canal selecionado ----------
+const ROWS=[
+  {sec:'Canal de compra'},
+  {k:'nota',label:'Custo na nota',cls:'sub',neutral:true},
+  {k:'icmsC',label:'ICMS (crédito)',cls:'sub',lr:true},
+  {k:'pisC',label:'PIS/COFINS (crédito)',cls:'sub',lr:true},
+  {k:'credCom',label:'Crédito PIS/COFINS sobre comissão + taxa fixa',cls:'sub',lr:true},
+  {k:'ipiC',label:'IPI (crédito)',cls:'sub',lr:true},
+  {k:'stC',label:'ICMS-ST',cls:'sub',lr:true},
+  {k:'notaC',label:'Custo de nota na compra',cls:'sub',lr:true},
+  {k:'custoLiq',label:'Custo líquido do produto',cls:'tot',neutral:true},
+  {sec:'Canal de venda'},
+  {k:'pList',label:'Preço de tabela (anúncio)',cls:'sub',neutral:true},
+  {k:'desc',label:'Desconto aplicado',cls:'sub'},
+  {k:'p',label:'Preço final ao cliente',cls:'tot',neutral:true},
+  {k:'icmsV',label:'ICMS',cls:'sub',lr:true},
+  {k:'difal',label:'ICMS DIFAL',cls:'sub',lr:true},
+  {k:'pisV',label:'PIS/COFINS',hint:'alíquota efetiva após exclusões da base',cls:'sub',lr:true},
+  {k:'ipiV',label:'IPI',cls:'sub',lr:true},
+  {k:'das',label:'Simples a recolher (DAS)',cls:'sub',sn:true},
+  {sec:'Taxas do canal e custos'},
+  {k:'com',label:'Comissão do marketplace',cls:'sub'},
+  {k:'fixa',label:'Taxa fixa por item',cls:'sub'},
+  {k:'frete',label:'Frete pago por você',cls:'sub'},
+  {k:'ads',label:'Ads',cls:'sub'},
+  {k:'reb',label:'Rebate do marketplace',cls:'sub'},
+  {k:'rebTax',label:'PIS/COFINS ou DAS sobre o rebate',cls:'sub'},
+  {k:'cred',label:'Crédito presumido',cls:'sub'},
+  {sec:'Resultados'},
+  {k:'receita',label:'Receita líquida',cls:'tot'},
+  {k:'credito',label:'Créditos da compra',cls:'sub'},
+  {k:'bruto',label:'Resultado bruto',cls:'tot'},
+  {k:'mb',label:'Margem bruta (res. bruto ÷ preço final)',cls:'sub',pct:true},
+  {k:'mc',label:'Margem de contribuição (R$)',hint:'resultado bruto − custo real',cls:'hi'},
+  {k:'mcp',label:'Margem de contribuição (%)',cls:'hi',pct:true},
+  {sec:'Carga tributária'},
+  {k:'recolher',label:'Tributos a recolher',cls:'sub'},
+  {k:'recuperar',label:'Tributos a recuperar',cls:'sub'},
+  {k:'imposto',label:'Imposto a pagar',cls:'tot',withPct:'impP'},
+  {k:'irpj',label:'IRPJ/CSLL (estimativa)',cls:'sub',lr:true},
+  {k:'liq',label:'Lucro após IRPJ/CSLL',cls:'tot',withPct:'liqP'},
+];
+function buildDre(){
+  const tb=$('dreBody');tb.innerHTML='';
+  ROWS.forEach(row=>{const tr=document.createElement('tr');
+    if(row.sec){tr.className='sec';tr.innerHTML=`<td colspan="3">${row.sec}</td>`;tb.appendChild(tr);return;}
+    tr.className=row.cls||'';
+    tr.innerHTML=`<td>${row.label}${row.hint?`<small>${row.hint}</small>`:''}</td><td><span class="cell"><span class="val" id="v_LR_${row.k}"></span></span></td><td><span class="cell"><span class="val" id="v_SN_${row.k}"></span></span></td>`;
+    tb.appendChild(tr);});
+}
+function fillDre(pEff){
+  const id=S.sel,R=pEff>0?calcCh(id,pEff,S):null;
+  $('dreTitle').textContent='DRE detalhada · '+CH_REF[id].nome;
+  $('chObs').innerHTML=`<b>${CH_REF[id].nome}</b> — referência: ${CH_REF[id].obs}.`;
+  ROWS.forEach(row=>{if(row.sec)return;['LR','SN'].forEach(reg=>{const el=$(`v_${reg}_${row.k}`);
+    if(!R||(row.lr&&reg==='SN')||(row.sn&&reg==='LR')){el.textContent='—';el.className='val dash';return;}
+    let v=R[reg][row.k];
+    if(row.k==='pList')v=N(S.preco);if(row.k==='desc')v=-(N(S.preco)-pEff);
+    if(v===undefined){el.textContent='—';el.className='val dash';return;}
+    let t=row.pct?pct(v):fmt(v);if(row.withPct)t+=` <span class="dash" style="font-size:12px">(${pct(R[reg][row.withPct])})</span>`;
+    el.innerHTML=t;el.className='val'+(row.neutral||Math.abs(v)<1e-9?'':(v>0?' pos':' neg'));
+  });});
+}
+
+// ---------- gráfico ----------
+function drawChart(pEff){
+  if(!(pEff>0)){$('chart').innerHTML='<p class="note" style="margin:24px 0">O gráfico aparece assim que houver preço.</p>';$('legend').innerHTML='';return;}
+  const W=760,H=300,L=48,Rr=14,T=14,B=34,pmin=Math.max(1,pEff*0.5),pmax=pEff*1.6,on=CH_IDS.filter(id=>S.ch[id].on);
+  const series={};let ymin=0,ymax=0.4;
+  on.forEach(id=>{series[id]=[];for(let i=0;i<=60;i++){const p=pmin+(pmax-pmin)*i/60;const y=calcCh(id,p,S).LR.mcp;series[id].push([p,y]);ymin=Math.min(ymin,y);ymax=Math.max(ymax,y);}});
+  ymin=Math.max(-1,Math.floor(ymin*10)/10);ymax=Math.ceil(ymax*10)/10;if(ymax-ymin<0.2)ymax=ymin+0.2;
+  const X=p=>L+(p-pmin)/(pmax-pmin)*(W-L-Rr),Y=y=>T+(ymax-Math.max(ymin,y))/(ymax-ymin)*(H-T-B);
+  let g='';const step=(ymax-ymin)/5;
+  for(let i=0;i<=5;i++){const y=ymin+step*i;g+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(y)}" y2="${Y(y)}" stroke="var(--line)"/><text x="${L-6}" y="${Y(y)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${Math.round(y*100)}%</text>`;}
+  for(let i=0;i<=4;i++){const p=pmin+(pmax-pmin)*i/4;g+=`<text x="${X(p)}" y="${H-12}" text-anchor="middle" font-size="11" fill="var(--muted)">${fmt(p)}</text>`;}
+  if(ymin<0&&ymax>0)g+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--line2)" stroke-width="1.5"/>`;
+  const m=S.tgt/100;if(m>ymin&&m<ymax)g+=`<line x1="${L}" x2="${W-Rr}" y1="${Y(m)}" y2="${Y(m)}" stroke="var(--line2)" stroke-dasharray="4 4"/>`;
+  g+=`<line x1="${X(pEff)}" x2="${X(pEff)}" y1="${T}" y2="${H-B}" stroke="var(--line2)" stroke-dasharray="4 4"/>`;
+  on.forEach(id=>{const d=series[id].map((pt,i)=>(i?'L':'M')+X(pt[0]).toFixed(1)+' '+Y(pt[1]).toFixed(1)).join(' ');const w=id===S.sel?3:1.6;g+=`<path d="${d}" fill="none" stroke="${CH_REF[id].cor}" stroke-width="${w}" opacity="${id===S.sel?1:.75}"/>`;
+    const y=calcCh(id,pEff,S).LR.mcp;g+=`<circle cx="${X(pEff)}" cy="${Y(y)}" r="4" fill="${CH_REF[id].cor}" stroke="var(--surface)" stroke-width="1.5"/>`;});
+  $('chart').innerHTML=`<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Margem por preço, por canal">${g}</svg>`;
+  $('legend').innerHTML=on.map(id=>`<span><i style="background:${CH_REF[id].cor}"></i>${CH_REF[id].nome}</span>`).join('')+'<span><i style="background:var(--line2);height:1px"></i>preço final atual / margem-alvo</span>';
+}
+
+// ---------- cenários ----------
+function loadScen(){try{return JSON.parse(localStorage.getItem('prec.scen6')||'[]');}catch(e){return[];}}
+function saveScen(l){try{localStorage.setItem('prec.scen6',JSON.stringify(l));}catch(e){}}
+function fillScen(){
+  const l=loadScen(),box=$('scenList');
+  if(!l.length){box.innerHTML='<div class="empty">Nenhum cenário salvo. Dê um nome e clique em Salvar para guardar o produto e as taxas neste navegador.</div>';return;}
+  box.innerHTML=l.map((s,i)=>`<div class="row"><div><b>${s.name}</b><small>tabela ${fmt(N(s.state.preco))}</small></div><div class="acts"><button class="btn sm" data-load="${i}" type="button">Abrir</button><button class="btn sm" data-del="${i}" type="button" aria-label="Excluir">✕</button></div></div>`).join('');
+  box.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{const st=l[b.dataset.load].state;S=Object.assign(JSON.parse(JSON.stringify(DEF)),st);S.ch=Object.assign(defChannels(),st.ch||{});clearInputs();bindGlobals();buildChannels();render();toast('Cenário aberto');});
+  box.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{l.splice(b.dataset.del,1);saveScen(l);fillScen();});
+}
+$('btnSave').onclick=()=>{const n=$('scenName').value.trim()||('Cenário '+new Date().toLocaleDateString('pt-BR'));const l=loadScen();const i=l.findIndex(s=>s.name===n);const item={name:n,state:JSON.parse(JSON.stringify(S))};if(i>=0)l[i]=item;else l.unshift(item);saveScen(l);$('scenName').value='';fillScen();toast('Cenário salvo: '+n);};
+$('btnReset').onclick=()=>{const ch=S.ch;S=JSON.parse(JSON.stringify(DEF));S.ch=ch;clearInputs();bindGlobals();buildChannels();render();toast('Produto limpo (taxas dos canais mantidas)');};
+$('btnResetCh').onclick=()=>{S.ch=defChannels();document.querySelectorAll('#chBody input[inputmode=decimal]').forEach(i=>i.value='');buildChannels();render();toast('Taxas de referência restauradas');};
+$('btnPrint').onclick=()=>window.print();
+let tt;function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('on'),1800);}
+
+function render(){
+  const pEff=effPrice(N(S.preco),S);
+  $('pEffLbl').value=N(S.preco)>0?pEff.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2}):'';
+  fillKpis(pEff);fillChannels(pEff);fillDre(pEff);drawChart(pEff);
+  try{localStorage.setItem('prec.state',JSON.stringify(S));}catch(e){}
+}
+bindGlobals();buildChannels();buildDre();render();fillScen();
+// Se o navegador restaurar valores nos campos depois do carregamento, relê a tela.
+function resync(){let ch=false;
+  globals.forEach(k=>{const v=parse($(gid(k)));if(v!==null&&v!==S[k]){S[k]=v;ch=true;}});
+  CH_IDS.forEach(id=>['comOv','fixaOv','outras','frete','ads'].forEach(k=>{const v=parse($(`c_${id}_${k}`));if(v!==null&&v!==S.ch[id][k]){S.ch[id][k]=v;ch=true;}}));
+  toggles.forEach(k=>{if($(k).checked!==!!S[k]){S[k]=$(k).checked;ch=true;}});
+  if($('descTipo').value!==S.descTipo){S.descTipo=$('descTipo').value;descUi();ch=true;}
+  if($('rebTipo').value!==S.rebTipo){S.rebTipo=$('rebTipo').value;rebUi();ch=true;}
+  if(ch)render();}
+[300,1200,3000].forEach(t=>setTimeout(resync,t));window.addEventListener('pageshow',resync);window.addEventListener('focus',resync);
+window.__calc=calcCh;window.__state=()=>S;
+})();
+</script>
+
+<script>
+if('serviceWorker' in navigator){window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').then(reg=>{reg.addEventListener('updatefound',()=>{const nw=reg.installing;nw&&nw.addEventListener('statechange',()=>{if(nw.state==='installed'&&navigator.serviceWorker.controller){const t=document.getElementById('toast');if(t){t.textContent='Nova versão disponível — feche e abra o app';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),4000);}}});});}).catch(()=>{});});}
+</script>
+</body></html>
