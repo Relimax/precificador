@@ -195,13 +195,16 @@ svg.chart{width:100%;height:auto;display:block;max-height:320px}
     <div class="field"><label for="r_pisV">PIS/COFINS<small id="pisEffLbl">efetiva —</small></label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_pisV"><span class="r">%</span></div></div>
     <div class="field"><label for="r_ipiV">IPI</label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_ipiV"><span class="r">%</span></div></div>
     <div class="field"><label for="r_irpj">IRPJ/CSLL estimado<small>% sobre o preço, opcional</small></label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_irpj"><span class="r">%</span></div></div>
-    <details class="sub"><summary>Regras e Simples (informativo)</summary>
+    <details class="sub"><summary>Regras de base do PIS/COFINS</summary>
       <div class="toggle"><label for="tExIcms">Retirar ICMS e DIFAL da base do PIS/COFINS<small>RE 574.706/PR</small></label><span class="switch"><input type="checkbox" id="tExIcms"><i></i></span></div>
       <div class="toggle"><label for="tExPis">Retirar PIS/COFINS da própria base<small>RE 1.233.096</small></label><span class="switch"><input type="checkbox" id="tExPis"><i></i></span></div>
       <div class="toggle"><label for="tIsentoDifal">Venda isenta de DIFAL</label><span class="switch"><input type="checkbox" id="tIsentoDifal"><i></i></span></div>
-      <div class="field"><label for="custoNotaSN">Custo na nota · Simples</label><div class="in"><span>R$</span><input type="text" inputmode="decimal" autocomplete="off" id="custoNotaSN"></div></div>
-      <div class="field"><label for="r_das">Alíquota do Simples (DAS)</label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_das"><span class="r">%</span></div></div>
     </details>
+  </section>
+
+  <section class="panel">
+    <h2>Simples Nacional <span class="eyebrow">informativo</span></h2>
+    <div class="field"><label for="r_das">Alíquota do Simples (DAS)<small>usa o mesmo custo real do produto</small></label><div class="in"><input type="text" inputmode="decimal" autocomplete="off" id="r_das"><span class="r">%</span></div></div>
   </section>
 
   <section class="panel">
@@ -243,7 +246,7 @@ svg.chart{width:100%;height:auto;display:block;max-height:320px}
   </table>
   </div>
   <p class="note" id="chObs"></p>
-  <p class="note" id="chNote">Taxas de referência (out/2026) das tabelas públicas de cada marketplace para Casa &amp; Decoração; a faixa muda sozinha conforme o preço final. Digite um valor na comissão ou na taxa fixa para sobrescrever com o número exato da sua conta. Clique no nome do canal para ligar/desligar.</p>
+  <p class="note" id="chNote">Shopee e TikTok seguem a política oficial publicada (a faixa muda sozinha conforme o preço final); Mercado Livre usa 11,5% / 18% e o custo fixo você digita; Amazon usa a tabela pública; Magalu você preenche. Digitar um valor na comissão ou na taxa fixa sobrescreve o automático. Clique no nome do canal para ligar/desligar.</p>
 
   <div class="sect"><h2 id="dreTitle">DRE detalhada</h2><span class="eyebrow">Lucro Real · Simples só informativo</span></div>
   <div class="tablewrap flat">
@@ -274,32 +277,31 @@ const parse=el=>{const t=String(el.value).trim().replace(/\s|R\$|%/g,'').replace
 // ---------- canais: tabelas de referência (out/2026) ----------
 // tiers: [{ate: preço final máximo, com: %, fixa: R$}] — a faixa é escolhida pelo preço final ao cliente
 const CH_REF={
-  mlc:{nome:'Mercado Livre Clássico',cor:'#F5B400',tiers:[{ate:19.99,com:12,fixa:5.5},{ate:78.99,com:12,fixa:6},{ate:Infinity,com:12,fixa:0}],outras:0,frete:null,ads:null,
-       obs:'12% Casa, Móveis e Decoração · custo fixo R$ 5,50–6,00 abaixo de R$ 79 · acima disso você paga parte do frete (campo Frete)'},
-  mlp:{nome:'Mercado Livre Premium',cor:'#2C6ED5',tiers:[{ate:19.99,com:17,fixa:5.5},{ate:78.99,com:17,fixa:6},{ate:Infinity,com:17,fixa:0}],outras:0,frete:null,ads:null,
-       obs:'17% Casa, Móveis e Decoração · parcelamento sem juros embutido'},
-  shp:{nome:'Shopee',cor:'#EE4D2D',tiers:[{ate:7.99,com:50,fixa:0},{ate:79.99,com:20,fixa:4},{ate:99.99,com:14,fixa:16},{ate:199.99,com:14,fixa:20},{ate:Infinity,com:14,fixa:26}],outras:0,frete:null,ads:null,
-       obs:'CNPJ, mar/2026: 20% + R$ 4 até R$ 79,99 · 14% + R$ 16/20/26 nas faixas seguintes · sem teto · Campanha de Destaque +2,5% em Outras'},
+  // fixa:null = custo fixo varia (peso/dimensão) → você digita · com:null = comissão depende da sua categoria → você digita · fixaPct = taxa fixa como % do preço
+  mlc:{nome:'Mercado Livre Clássico',cor:'#F5B400',tiers:[{ate:Infinity,com:11.5,fixa:null}],outras:0,frete:null,ads:null,
+       obs:'11,5% de comissão · custo fixo por unidade varia por peso e faixa de preço (veja no simulador do anúncio e digite) · acima de R$ 79 você paga parte do frete (campo Frete)'},
+  mlp:{nome:'Mercado Livre Premium',cor:'#2C6ED5',tiers:[{ate:Infinity,com:18,fixa:null}],outras:0,frete:null,ads:null,
+       obs:'18% de comissão (parcelamento sem juros embutido) · custo fixo por unidade varia por peso e faixa de preço (digite)'},
+  shp:{nome:'Shopee',cor:'#EE4D2D',tiers:[{ate:8.99,com:20,fixa:0,fixaPct:50},{ate:79.99,com:20,fixa:4.5},{ate:99.99,com:14,fixa:16},{ate:199.99,com:14,fixa:20},{ate:Infinity,com:14,fixa:26}],outras:0,frete:null,ads:null,
+       obs:'política oficial CNPJ vigente desde 01/10/2026: até R$ 79,99 → 20% + R$ 4,50 (abaixo de R$ 9 o fixo é metade do preço) · R$ 80–99,99 → 14% + R$ 16 · R$ 100–199,99 → 14% + R$ 20 · R$ 200+ → 14% + R$ 26 · a comissão já inclui a taxa de transação · Campanha de Destaque +2,5% em Outras'},
   amz:{nome:'Amazon',cor:'#232F3E',tiers:[{ate:Infinity,com:15,fixa:0}],outras:0,frete:null,ads:null,
-       obs:'Casa e Cozinha 12–15% (referência 15%) · plano profissional sem taxa por item'},
-  mgl:{nome:'Magalu',cor:'#0086FF',tiers:[{ate:Infinity,com:16,fixa:0}],outras:0,frete:null,ads:null,
-       obs:'Móveis e Decoração 14–18% (referência 16%)'},
-  ttk:{nome:'TikTok Shop',cor:'#111111',tiers:[{ate:49.99,com:10,fixa:4},{ate:Infinity,com:6,fixa:6}],outras:6,frete:null,ads:null,
-       obs:'desde 15/07/2026: 10% + R$ 4 abaixo de R$ 50 · 6% + R$ 6 a partir de R$ 50 · +6% programa de frete grátis (em Outras)'},
-  shn:{nome:'SHEIN',cor:'#7A3E9D',tiers:[{ate:Infinity,com:18,fixa:0}],outras:0,frete:null,ads:null,
-       obs:'18% desde 01/03/2026 · sem taxa fixa · frete por conta do vendedor (campo Frete)'},
+       obs:'tabela pública oficial: Casa e Cozinha 12% · Decoração e demais categorias 15% (referência) · comissão mínima R$ 2 · plano profissional sem taxa por item'},
+  mgl:{nome:'Magalu',cor:'#0086FF',tiers:[{ate:Infinity,com:null,fixa:null}],outras:0,frete:null,ads:null,
+       obs:'comissão por categoria e tarifa fixa estão na central do parceiro (exige login): abra lá e digite os dois valores · frete conforme a política de frete do portal (campo Frete)'},
+  ttk:{nome:'TikTok Shop',cor:'#111111',tiers:[{ate:49.99,com:10,fixa:4},{ate:Infinity,com:6,fixa:6}],outras:0,frete:null,ads:null,
+       obs:'política oficial desde 15/07/2026, sobre o preço após descontos do vendedor: abaixo de R$ 50 → 10% + R$ 4 · R$ 50 ou mais → 6% + R$ 6'},
 };
 const CH_IDS=Object.keys(CH_REF);
 function defChannels(){const o={};CH_IDS.forEach(id=>{o[id]={on:true,comOv:null,fixaOv:null,outras:CH_REF[id].outras,frete:null,ads:null};});return o;}
 
 const DEF={
-  custoReal:null,custoNota:null,custoNotaSN:null,preco:null,descTipo:'pct',descVal:null,
+  custoReal:null,custoNota:null,preco:null,descTipo:'pct',descVal:null,
   icmsC:null,pisC:9.25,ipiC:null,stC:null,notaC:null, icmsV:null,difalV:null,pisV:9.25,ipiV:null,irpj:null, das:null,
   tExIcms:true,tExPis:true,tIsentoDifal:false,tRebPis:false,tCredPres:false,
   rebTipo:'rs',rebVal:null,credPres:null,
   tgt:20, sel:'mlc', ch:defChannels()
 };
-const VER='6';
+const VER='7';
 let S=JSON.parse(JSON.stringify(DEF));
 try{
   if(localStorage.getItem('prec.ver')!==VER){localStorage.removeItem('prec.state');localStorage.setItem('prec.ver',VER);}
@@ -310,8 +312,11 @@ try{
 function effPrice(pList,s){const d=N(s.descVal);const e=s.descTipo==='rs'?pList-d:pList*(1-d/100);return Math.max(0,e);}
 function listPrice(pEff,s){const d=N(s.descVal);return s.descTipo==='rs'?pEff+d:(d>=100?NaN:pEff/(1-d/100));}
 function tierFor(id,p){return CH_REF[id].tiers.find(t=>p<=t.ate)||CH_REF[id].tiers[CH_REF[id].tiers.length-1];}
-function chFees(id,p,s){const c=s.ch[id],t=tierFor(id,p);const comPct=(c.comOv===null?t.com:N(c.comOv))+N(c.outras);const fixa=c.fixaOv===null?t.fixa:N(c.fixaOv);
-  return {comPct,comBase:c.comOv===null?t.com:N(c.comOv),fixa,frete:N(c.frete),adsPct:N(c.ads),auto:c.comOv===null,autoF:c.fixaOv===null};}
+function chFees(id,p,s){const c=s.ch[id],t=tierFor(id,p);
+  const comBase=c.comOv===null?N(t.com):N(c.comOv), comPct=comBase+N(c.outras);
+  const tierFixa=t.fixaPct?p*t.fixaPct/100:N(t.fixa);
+  const fixa=c.fixaOv===null?tierFixa:N(c.fixaOv);
+  return {comPct,comBase,fixa,frete:N(c.frete),adsPct:N(c.ads),auto:c.comOv===null,autoF:c.fixaOv===null,needCom:c.comOv===null&&t.com===null,needFixa:c.fixaOv===null&&t.fixa===null};}
 function rebate(p,s){const v=N(s.rebVal);return s.rebTipo==='rs'?v:p*v/100;}
 // Lucro Real (replica a planilha; Ads e frete como custo; MC = resultado bruto − custo real)
 function calcLR(p,s,f){
@@ -334,7 +339,7 @@ function calcLR(p,s,f){
     receita,credito,bruto,mb:p?bruto/p:0,mc,mcp:p?mc/p:0,recolher,recuperar,imposto,impP:p?imposto/p:0,irpj,liq:mc+irpj,liqP:p?(mc+irpj)/p:0,markup:nota?p/nota:0};
 }
 function calcSN(p,s,f){
-  const nota=N(s.custoNotaSN), custoLiq=nota, das=-p*N(s.das)/100;
+  const nota=N(s.custoReal), custoLiq=nota, das=-p*N(s.das)/100;
   const com=-(p*f.comPct/100), fixa=-f.fixa, frete=-f.frete, ads=-p*f.adsPct/100;
   const reb=rebate(p,s), rebTax=s.tRebPis?-reb*N(s.das)/100:0, cred=s.tCredPres?N(s.credPres):0;
   const receita=p+das+rebTax+frete+ads+com+fixa+reb+cred, bruto=receita, mc=bruto-N(s.custoReal);
@@ -351,7 +356,7 @@ function priceForCh(id,m,s){
 }
 
 // ---------- bind ----------
-const globals=['custoReal','custoNota','custoNotaSN','preco','descVal','icmsC','pisC','ipiC','stC','notaC','icmsV','difalV','pisV','ipiV','irpj','das','rebVal','credPres'];
+const globals=['custoReal','custoNota','preco','descVal','icmsC','pisC','ipiC','stC','notaC','icmsV','difalV','pisV','ipiV','irpj','das','rebVal','credPres'];
 const gid=k=>['icmsC','pisC','ipiC','stC','notaC','icmsV','difalV','pisV','ipiV','irpj','das'].includes(k)?'r_'+k:k;
 const toggles=['tExIcms','tExPis','tIsentoDifal','tRebPis','tCredPres'];
 const sync=(el,cur)=>{const v=parse(el);if(v!==null)return v;el.value=cur??'';return cur;};
@@ -373,8 +378,8 @@ function buildChannels(){
     const tr=document.createElement('tr');tr.className='ch';tr.dataset.id=id;
     tr.innerHTML=`<td class="nm" title="${r.obs}"><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.cor};margin-right:8px;vertical-align:middle"></span>${r.nome}</td>
       <td id="mg_${id}"></td><td id="id_${id}"></td>
-      <td><span class="rate"><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_comOv" placeholder="auto"><span>%</span></span><span class="cap" id="comAuto_${id}"></span></td>
-      <td><span class="rate w"><span style="padding-left:6px">R$</span><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_fixaOv" placeholder="auto"></span><span class="cap" id="fixaAuto_${id}"></span></td>
+      <td><span class="rate"><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_comOv" placeholder="${r.tiers[0].com===null?'digite':'auto'}"><span>%</span></span><span class="cap" id="comAuto_${id}"></span></td>
+      <td><span class="rate w"><span style="padding-left:6px">R$</span><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_fixaOv" placeholder="${r.tiers[0].fixa===null?'digite':'auto'}"></span><span class="cap" id="fixaAuto_${id}"></span></td>
       <td><span class="rate"><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_outras"><span>%</span></span></td>
       <td><span class="rate w"><span style="padding-left:6px">R$</span><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_frete"></span></td>
       <td><span class="rate"><input type="text" inputmode="decimal" autocomplete="off" id="c_${id}_ads"><span>%</span></span></td>
@@ -391,8 +396,8 @@ function fillChannels(pEff){
     tr.classList.toggle('sel',S.sel===id);tr.classList.toggle('off',!c.on);
     if(!(pEff>0)){$(`mg_${id}`).innerHTML=$(`id_${id}`).innerHTML='<span class="dash">—</span>';$(`comAuto_${id}`).textContent='';$(`fixaAuto_${id}`).textContent='';return;}
     const R=calcCh(id,pEff,S),f=R.f,L=R.LR;
-    $(`comAuto_${id}`).textContent=f.auto?`faixa: ${f.comBase.toLocaleString('pt-BR')}%`:'digitado';
-    $(`fixaAuto_${id}`).textContent=f.autoF?`faixa: ${fmt(f.fixa)}`:'digitado';
+    $(`comAuto_${id}`).innerHTML=f.needCom?'<span class="warn">digite a comissão</span>':f.auto?`faixa: ${f.comBase.toLocaleString('pt-BR')}%`:'digitado';
+    $(`fixaAuto_${id}`).innerHTML=f.needFixa?'<span class="warn">digite o custo fixo</span>':f.autoF?`faixa: ${fmt(f.fixa)}`:'digitado';
     const cls=L.mc>0?'pos':'neg';
     $(`mg_${id}`).innerHTML=`<span class="pr ${cls}">${pct(L.mcp)}</span><span class="cap"><b class="${cls}">${fmt(L.mc)}</b>/un · taxas ${fmt(L.taxas)} (${pct(L.taxas/pEff)}) · imposto ${fmt(L.imposto)}</span>`;
     const pi=priceForCh(id,m,S),pl=listPrice(pi,S),hasD=N(S.descVal)>0;

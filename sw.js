@@ -1,6 +1,6 @@
 // Precificador Relimax — service worker: deixa o app abrir sem internet.
 // Ao publicar uma versão nova, troque o número abaixo para o app atualizar.
-const VERSION = 'v6-2026-10-16';
+const VERSION = 'v7-2026-10-16';
 const CACHE = 'precificador-' + VERSION;
 const FILES = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-512-maskable.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting())); });
